@@ -162,14 +162,10 @@ bash scripts/03_cellbender.sh
 
 ## Authors & Citation
 
-* **Your Name** - *Initial Work / Pipeline development* - [YourGitHub](https://github.com/yourusername)
+* **Raquel Cossío Ramírez** - *Pipeline development* - [GitHub](https://github.com/raqcoss)
 
 If you use this pipeline or code in your research, please cite:
 
 > [Insert your publication citation or preprint info here]
-> """
 
-with open("README.md", "w") as f:
-f.write(markdown_content)
-print("Markdown template generated successfully.")
-"""
+If you have issues or doubts please [send me an email](mailto:raquel.cossior@gmail.com)
