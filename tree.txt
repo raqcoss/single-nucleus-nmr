@@ -1,0 +1,119 @@
+.
+├── A_Preprocessing
+│   ├── 01_sequencing_metrics.ipynb
+│   ├── 02_cellbender_qc.ipynb
+│   └── orthology
+│       ├── 01_make_orthology_map.ipynb
+│       └── 02_othology_reference.ipynb
+├── B_Cannonical
+├── C_Optimization
+│   ├── figures
+│   │   ├── analysis_0_depth1_silhouette.png
+│   │   ├── analysis_1_depth1_silhouette.png
+│   │   ├── analysis_2_depth1_silhouette.png
+│   │   ├── analysis_3_depth1_silhouette.png
+│   │   ├── analysis_4_depth1_silhouette.png
+│   │   ├── analysis_5_depth1_silhouette.png
+│   │   ├── umap_analysis_0_depth1.png
+│   │   ├── umap_analysis_1_depth1.png
+│   │   ├── umap_analysis_2_depth1.png
+│   │   ├── umap_analysis_3_depth1.png
+│   │   ├── umap_analysis_4_depth1.png
+│   │   ├── umap_analysis_5_depth1.png
+│   │   └── umaphippocampus_recursive_hpo_subclustering_umap.png
+│   └── subcluster copy.ipynb
+├── D_Annotation
+│   ├── CADuMS
+│   │   ├── CADuMS.ipynb
+│   │   └── celltype_lineage.png
+│   ├── CellTrain
+│   │   ├── primary_celltypes.ipynb
+│   │   └── primary_celltypes_v2.ipynb
+│   ├── gseapy
+│   │   └── gsea_ann.ipynb
+│   ├── PanglaoDB_markers_27_Mar_2020.tsv
+│   ├── scanvi
+│   │   └── scanvi_label_transfer.ipynb
+│   └── XSLT
+│       ├── 1_main_preprocessing.ipynb
+│       └── 2_cross_species_annotation.ipynb
+├── data
+│   ├── gene_lists
+│   │   ├── hemo_genes.txt
+│   │   ├── human_ribo_genes.csv
+│   │   ├── mito_genes.txt
+│   │   ├── nmr_human_orthology.csv
+│   │   └── tf_genes.txt
+│   ├── processed
+│   │   └── path.txt
+│   ├── raw
+│   │   └── path.txt
+│   └── reference
+│       ├── human_dev_glossary.xlsx
+│       └── human_glossary.csv
+├── E_LabelRefinement
+│   ├── 01_cortex_cadmus_refinement.ipynb
+│   ├── 02_hippocampus_cadmus_refinement.ipynb
+│   ├── 03_saving_midbrain.ipynb
+│   ├── 04_midbrain_annotation.ipynb
+│   ├── 05_all_region_refinement.ipynb
+│   ├── 06_check_refined_annotations.ipynb
+│   └── manual_annotation_all_regions.csv
+├── environment.yml
+├── envs
+│   ├── cellbender-env.yml
+│   └── scanpy-env.yml
+├── pyproject.toml
+├── README.md
+├── results
+│   ├── cellranger_metrics.csv
+│   ├── Cerebral cortex_refined_cell_composition.png
+│   ├── Hippocampus_refined_cell_composition.png
+│   ├── manual_annotation_all_regions.csv
+│   └── Midbrain_refined_cell_composition.png
+├── scripts
+│   ├── adaptive_clustering.py
+│   ├── annotation_tools.py
+│   ├── __init__.py
+│   ├── optimization_tools.py
+│   ├── plot_functions.py
+│   ├── __pycache__
+│   │   ├── adaptive_clustering.cpython-312.pyc
+│   │   ├── __init__.cpython-312.pyc
+│   │   └── plot_functions.cpython-312.pyc
+│   ├── run_cellbender.sh
+│   ├── run_cellranger.sh
+│   ├── run_fastqc.sh
+│   └── sample_list_cellranger.tsv
+├── single_nucleus_nmr.egg-info
+│   ├── dependency_links.txt
+│   ├── PKG-INFO
+│   ├── SOURCES.txt
+│   └── top_level.txt
+├── tree.txt
+└── Z_Archive
+    └── seurat
+        ├── all_in_one.R
+        ├── analysis.r
+        ├── another_similarity_code.R
+        ├── careful_analysis.R
+        ├── cell_identification.R
+        ├── cell_markers.R
+        ├── clustering_data.R
+        ├── clustering_qc.R
+        ├── cluster_specific_gsea_results1.csv
+        ├── convert_to_loom.R
+        ├── doublet_filtering.R
+        ├── find_means.R
+        ├── full_session_log_12-04-2025.txt
+        ├── gsea_results.csv
+        ├── mito_genes.txt
+        ├── mixed_tf_genes.txt
+        ├── ploting_functions.R
+        ├── post_analysis.r
+        ├── ratopin_functions.R
+        ├── soupXdenoise.R
+        ├── tf_genes.txt
+        └── top_gsea_pathways.csv
+
+24 directories, 92 files

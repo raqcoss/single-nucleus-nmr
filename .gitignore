@@ -1,0 +1,76 @@
+# ==========================================
+# 1. Single-Cell & Large Genomic Data (CRITICAL)
+# ==========================================
+# Never commit raw or processed datasets (h5ad, loom, h5, csv)
+data/raw/
+data/processed/
+data/reference/
+
+# Exception: Allow text-based gene lists and maps
+!data/*.txt
+!data/*.csv
+
+# Block any accidental data dumps anywhere in the repo
+*.h5ad
+*.loom
+*.h5
+*.fq.gz
+*.fastq.gz
+*.bam
+*.bai
+*.tar.gz
+
+# ==========================================
+# 2. Machine Learning & Model States
+# ==========================================
+# Ignore trained scVI / scANVI and custom classifier models
+*.pt
+*.pkl
+*.pth
+**/model.pt
+
+# ==========================================
+# 3. Python Environment & Packaging
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+.installed.cfg
+*.egg
+
+# ==========================================
+# 4. Jupyter Notebook Artifacts
+# ==========================================
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+# Prevents giant inline plot outputs from ballooning git diffs (optional but helpful)
+# .ipynb_checkpoints/
+
+# ==========================================
+# 5. OS & IDE-specific files
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+.idea/
+.virtualenv/
+.env
+venv/
+env/
