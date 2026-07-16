@@ -2,6 +2,70 @@ import gseapy as gp
 from gseapy.plot import gseaplot, gseaplot2
 import pandas as pd
 import numpy as np
+def annotate_with_celltypist(adata, model_name: str, subcluster_col: str = "leiden_4.0", min_prop: float = 0.2, plot_umap: bool = True):
+    """
+    Annotate single-cell data using a CellTypist model and plot the results on a UMAP.
+
+    This function attempts to run CellTypist annotation on the input AnnData object. 
+    If the specified model is not found locally, it will attempt to download it 
+    automatically. If successful, it adds the raw and majority-voting predictions 
+    to the AnnData's `.obs` and generates a UMAP plot.
+
+    Parameters
+    ----------
+    vdata : AnnData
+        The AnnData object containing the single-cell dataset to annotate.
+    model_name : str
+        The name of the CellTypist model (e.g., 'Immune_All_LowResolution') 
+        without the '.pkl' extension.
+
+    Returns
+    -------
+    AnnData
+        The annotated AnnData object with celltypist predictions added to `.obs`.
+    """
+    import celltypist
+    from celltypist import models
+    import scanpy as sc
+    model_file = f"{model_name}.pkl"
+    
+    try:
+        # Attempt annotation with the local model
+        predictions = celltypist.annotate(
+            adata, 
+            model=model_file, 
+            majority_voting=True, 
+            over_clustering=subcluster_col, 
+            min_prop=min_prop
+        )
+    except Exception: 
+        print(f"Model '{model_file}' not found. Trying to download it...")
+        try: 
+            # Attempt to download the model
+            models.download_models(model=model_file)
+            
+            # Retry annotation after downloading
+            predictions = celltypist.annotate(
+                adata, 
+                model=model_file, 
+                majority_voting=True, 
+                over_clustering='leiden_4.0', 
+                min_prop=0.2
+            )
+        except Exception as e: 
+            print(f"Model '{model_name}' is not available to download. Skipping. Error: {e}")
+            return adata
+
+    # Map predicted labels to the AnnData metadata
+    adata.obs[f'celltypist_{model_name}'] = adata.obs_names.map(predictions.predicted_labels.predicted_labels)
+    adata.obs[f'celltypist_{model_name}_mv'] = adata.obs_names.map(predictions.predicted_labels.majority_voting)
+    
+    # Plot the results
+    if plot_umap:
+        sc.pl.umap(adata, color=[f'celltypist_{model_name}', f'celltypist_{model_name}_mv'])
+    
+    return adata
+
 
 def run_gsea_on_group(
     clus_markers,
@@ -245,3 +309,137 @@ def plot_gsea_grid(
     plt.show()
 
     return all_results, fig
+
+def parse_markers(adata, marker_table: pd.DataFrame, top_hvg: int = 5000):
+    """
+    Filter and split positive and negative marker genes from a metadata table 
+    against the (optionally HVG-filtered) gene names in an AnnData object.
+
+    This function parses comma-separated marker gene strings in a DataFrame, 
+    validates them against the genes present in `adata` (optionally restricting 
+    the search space to the top N highly variable genes), and maps them to their 
+    respective cell types/classes.
+
+    Parameters
+    ----------
+    adata : AnnData
+        The AnnData object containing the single-cell dataset. If `top_hvg` is 
+        provided, `adata.var` must contain a `'highly_variable_rank'` column.
+    marker_table : pd.DataFrame
+        A pandas DataFrame that contains at least the following columns:
+        - 'class': Name of the cell type or cluster.
+        - 'pos_markers': Comma-separated string of positive marker genes (or NaN).
+        - 'neg_markers': Comma-separated string of negative marker genes (or NaN).
+    top_hvg : int or None, default 5000
+        The rank cutoff for highly variable genes to restrict the search. Only 
+        genes with a `'highly_variable_rank'` less than or equal to this value 
+        will be considered. If set to `None`, all genes in `adata.var_names` 
+        are used.
+
+    Returns
+    -------
+    pos_markers : dict
+        A dictionary mapping each 'class' to a list of matching positive marker genes.
+    neg_markers : dict
+        A dictionary mapping each 'class' to a list of matching negative marker genes.
+    not_found_genes_overall : list of str
+        A list of all marker genes defined in the table that were either missing 
+        from `adata` or filtered out because they exceeded the `top_hvg` threshold.
+    """
+    pos_markers = {}
+    not_found_genes_overall = []
+
+    if top_hvg is not None:
+        var_names = set(adata.var_names[adata.var["highly_variable_rank"] <= top_hvg])  
+    else:
+        var_names = set(adata.var_names)
+
+    for i, lst in enumerate(marker_table.pos_markers):
+        found_genes = []
+        not_found_genes = []
+        if lst is not np.nan:
+            for gene in lst.split(','):
+                gene = gene.strip()
+                if gene in var_names:
+                    found_genes.append(gene)
+                else:
+                    not_found_genes.append(gene)
+            
+            pos_markers[marker_table['class'][i]] = found_genes
+            not_found_genes_overall.extend(not_found_genes)
+    print(f"Positive markers found in adata.var:")
+    print(pos_markers)
+
+    neg_markers = {}
+    for i, lst in enumerate(marker_table.neg_markers):
+        found_genes = []
+        not_found_genes = []
+        if lst is np.nan:
+            neg_markers[marker_table['class'][i]] = []
+            continue
+        else:
+            for gene in lst.split(','):
+                gene = gene.strip()
+                if gene in var_names:
+                    found_genes.append(gene)
+                else:
+                    not_found_genes.append(gene)
+            
+            neg_markers[marker_table['class'][i]] = found_genes
+            not_found_genes_overall.extend(not_found_genes)
+    print(f"Negative markers found in adata.var:")
+    print(neg_markers)
+    print(f"Not found genes: {len(not_found_genes_overall)}")
+    print(not_found_genes_overall)
+    
+    return pos_markers, neg_markers, not_found_genes_overall
+
+
+
+# 1. PREPARE THE NET SCORING FUNCTION
+def apply_dual_marker_scoring(adata, pos_dict, neg_dict):
+    """
+    Calculates a Net Score: Positive Marker Signal - Negative Marker Signal.
+    """
+    all_cell_types = list(pos_dict.keys())
+    
+    for cell_type in all_cell_types:
+        # Get markers, ensuring they exist in the dataset
+        pos_list = [g for g in pos_dict[cell_type] if g in adata.var_names]
+        neg_list = [g for g in neg_dict.get(cell_type, []) if g in adata.var_names]
+        
+        # Calculate Positive Score
+        if pos_list:
+            sc.tl.score_genes(adata, gene_list=pos_list, score_name=f"{cell_type}_pos_score")
+        else:
+            adata.obs[f"{cell_type}_pos_score"] = 0
+            
+        # Calculate Negative Score (Penalty)
+        if neg_list:
+            sc.tl.score_genes(adata, gene_list=neg_list, score_name=f"{cell_type}_neg_score")
+        else:
+            adata.obs[f"{cell_type}_neg_score"] = 0
+            
+        # Compute Net Score
+        # Logic: Net = Positive - Negative. 
+        # We also apply a 'Relativity' clip: if negative signal is stronger than positive, score is 0.
+        adata.obs[f"{cell_type}_net_score"] = adata.obs[f"{cell_type}_pos_score"] - adata.obs[f"{cell_type}_neg_score"]
+        adata.obs.loc[adata.obs[f"{cell_type}_net_score"] < 0, f"{cell_type}_net_score"] = 0
+
+    # 2. ASSIGN INITIAL LABELS
+    net_score_cols = [f"{ct}_net_score" for ct in all_cell_types]
+    
+    # Find the best fitting cell type for each cell
+    adata.obs['marker_label'] = adata.obs[net_score_cols].idxmax(axis=1).str.replace("_net_score", "")
+    adata.obs['max_net_score'] = adata.obs[net_score_cols].max(axis=1)
+    
+    # 3. DEFINE HIGH-CONFIDENCE ANCHORS
+    # A cell is "High Confidence" if it has a strong net score (e.g., > 0.1)
+    # This excludes cells that have high negative marker expression or weak positive signals.
+    adata.obs['reject_prediction'] = adata.obs['max_net_score'] < 0.5
+    
+    return adata
+
+# Execute the scoring
+adata = apply_dual_marker_scoring(adata, celltype_pos_markers, celltype_neg_markers)
+

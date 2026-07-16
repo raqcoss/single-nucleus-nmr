@@ -9,6 +9,7 @@ data/reference/
 # Exception: Allow text-based gene lists and maps
 !data/*.txt
 !data/*.csv
+!data/*.tsv
 
 # Block any accidental data dumps anywhere in the repo
 *.h5ad
