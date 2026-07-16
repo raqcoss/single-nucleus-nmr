@@ -8,12 +8,12 @@ This repository contains the bioinformatics pipeline and custom scripts develope
 - [Overview](#-overview)
 - [Repository Structure](#-repository-structure)
 - [Pipeline Workflow](#-pipeline-workflow)
-  - [1. Raw Data Quality Control (FastQC)](#1-raw-data-quality-control-fastqc)
-  - [2. Alignment and Quantification (CellRanger)](#2-alignment-and-quantification-cellranger)
-  - [3. Ambient RNA Removal (CellBender)](#3-ambient-rna-removal-cellbender)
-  - [4. Downstream Quality Control & Filtering](#4-downstream-quality-control--filtering)
-  - [5. HPO & Recursive Clustering](#5-hpo--recursive-clustering)
-  - [6. Cell-Type Annotation](#6-cell-type-annotation)
+  - [A. Preprocessing (From reads to high-quality count matrix)](#A_Preprocessing)
+  - [B. Pipeline](#B_Pipeline)
+  - [B1. Integration Benchmark and Clustering Optimization](#B_Optimization)
+  - [B2. Annotation Methods](#B2_Annotation)
+  - [C. Manual Refinement](#C_Refinement)
+  - [Z. Archive](#Z_Archive)
 - [Installation & Environment Setup](#-installation--environment-setup)
 - [Usage Instructions](#-usage-instructions)
 - [Contributing](#-contributing)
@@ -31,32 +31,44 @@ This repository standardizes the workflow from raw `.fastq` reads to stable clus
 
 ## Repository Structure
 
-
-```
-
 ```text
-Markdown template generated successfully.
-
 ```directory
-├── README.md
-├── LICENSE
-├── environment.yml               # Conda environment specifications
-├── config/
-│   └── config.yaml               # Pipeline hyperparameters and paths
+
+├── A_Preprocessing
+│   ├── 01_sequencing_metrics.ipynb
+│   ├── 02_cellbender_qc.ipynb
+│   └── orthology/
+├── B1_Optimization
+│   ├── 01_batch_correction_bm.ipynb
+│   ├── 02_recursive_subclustering.ipynb
+│   └── figures/
+├── B2_Annotation
+│   ├── CADuMS/
+│   ├── CellTrain/
+│   ├── celltypist/
+│   ├── gseapy/
+│   ├── scanvi/
+│   └── XSLT/
+├── B_Pipeline
+│   ├── 01_classic_processing.ipynb
+│   ├── 02_optimal_processing.ipynb
+│   └── 03_join_clusters_and_annotations.ipynb
+├── C_Refinement
+│   ├── 01_cortex_cadmus_refinement.ipynb
+│   ├── 02_hippocampus_cadmus_refinement.ipynb
+│   ├── 03_saving_midbrain.ipynb
+│   ├── 04_midbrain_annotation.ipynb
+│   ├── 05_all_region_refinement.ipynb
+│   ├── 06_check_refined_annotations.ipynb
 ├── data/
-│   ├── reference/                # Naked mole-rat genome assembly and GTF
-│   └── raw/                      # Placeholder or symlinks for raw FASTQ data
-├── scripts/
-│   ├── 01_fastqc.sh              # Quality control on raw reads
-│   ├── 02_cellranger_count.sh    # Reference building and cellranger count
-│   └── 03_cellbender.sh          # Ambient RNA background removal
-├── notebooks/
-│   ├── 04_downstream_qc.Rmd      # Seurat/Scanpy based cellular QC filtering
-│   ├── 05_recursive_clustering.Rmd# HPO and multi-level clustering logic
-│   └── 06_cell_type_annotation.Rmd# Annotation using automatic tools and markers
-└── results/                  
-    ├── figures/                  # Generated plots (UMAPs, dotplots, etc.)
-    └── objects/                  # Saved processed objects (.rds or .h5ad)
+├── envs/                         # Conda environment specifications
+├── LICENSE
+├── pyproject.toml
+├── README.md
+├── results/
+├── scripts/                      # Quick acess to custom functions and scripts
+└── Z_Archive      
+    └── seurat/                   # Alternative analysis in seurat
 
 ```
 
@@ -64,15 +76,14 @@ Markdown template generated successfully.
 
 ## Pipeline Workflow
 
-### 1. Raw Data Quality Control (FastQC)
+### A. Preprocessing (From reads to high-quality count matrix)
 
-Initial quality assessment of raw sequence reads to evaluate base qualities, GC content, adapter contamination, and duplication levels.
+- Quality assessment of raw sequence reads to evaluate base qualities, GC content, adapter contamination, and duplication levels: `run_fasqc.sh`
+- Alignment of reads to reference genome using `cellranger` from 10X Genomics:  `run_cellranger.sh`, `01_sequencing_metrics.ipynb`
+- Denoising ambient RNA using `CellBender`: `run_cellbender.sh`using
+- Filter low quality genes and cells: `main_preprocessing.ipynb' (Note: this notebook also performs the preprocessing and merge of human and NMR datasets to perform comparisons between species)
 
-* **Tools:** `FastQC` v0.11.9, `MultiQC` v1.11
-* **Script:** `scripts/01_fastqc.sh`
-* *Note: [Add your specific sequencing parameters or notes here]*
-
-### 2. Alignment and Quantification (CellRanger)
+### B. Pipeline
 
 Read alignment to the *Heterocephalus glaber* reference genome and generation of raw/filtered gene-expression matrices.
 
@@ -80,7 +91,7 @@ Read alignment to the *Heterocephalus glaber* reference genome and generation of
 * **Script:** `scripts/02_cellranger_count.sh`
 * *Note: Custom modifications made to the GTF file (e.g., handling of unannotated untranslated regions or lncRNAs) should be detailed here.*
 
-### 3. Ambient RNA Removal (CellBender)
+### B1. Integration Benchmark and Clustering Optimization
 
 Elimination of background/ambient RNA contamination typical in single-nucleus preparations using a deep generative model.
 
@@ -88,21 +99,21 @@ Elimination of background/ambient RNA contamination typical in single-nucleus pr
 * **Script:** `scripts/03_cellbender.sh`
 * *Note: [Specify expected-cells and total-droplets parameters used here]*
 
-### 4. Downstream Quality Control & Filtering
+### B2. Annotation Methods
 
 Filtering of low-quality nuclei based on data-driven thresholds (e.g., minimum/maximum UMI counts, unique gene counts, and mitochondrial gene percentage bounds tailored to nuclear sequencing).
 
 * **Tools:** `Scanpy` (Python)
 * **Notebook:** `notebooks/04_downstream_qc.Rmd`
 
-### 5. HPO & Recursive Clustering
+### C. Manual Refinement
 
 Hyperparameter Optimization (HPO) for clustering resolution combined with an iterative, recursive clustering framework to separate major lineages (neurons, glia, vascular cells) down to distinct sub-populations.
 
 * **Methodology:** [Detail your specific HPO or recursive split metrics here, e.g., Silhouette score, ROGUE, or resolution sweep]
 * **Notebook:** `notebooks/05_recursive_clustering.Rmd`
 
-### 6. Cell-Type Annotation
+### Z. Archive
 
 Multi-pronged approach for cell-type classification using integrated automated tools alongside manual verification with canonical marker genes.
 
