@@ -37,6 +37,7 @@ This repository standardizes the workflow from raw `.fastq` reads to stable clus
 ├── A_Preprocessing
 │   ├── 01_sequencing_metrics.ipynb
 │   ├── 02_cellbender_qc.ipynb
+│   ├── 03_preprocessing.ipynb
 │   └── orthology/
 ├── B1_Optimization
 │   ├── 01_batch_correction_bm.ipynb
@@ -77,27 +78,28 @@ This repository standardizes the workflow from raw `.fastq` reads to stable clus
 ## Pipeline Workflow
 
 ### A. Preprocessing (From reads to high-quality count matrix)
-
-- Quality assessment of raw sequence reads to evaluate base qualities, GC content, adapter contamination, and duplication levels: `run_fasqc.sh`
-- Alignment of reads to reference genome using `cellranger` from 10X Genomics:  `run_cellranger.sh`, `01_sequencing_metrics.ipynb`
-- Denoising ambient RNA using `CellBender`: `run_cellbender.sh`using
-- Filter low quality genes and cells: `main_preprocessing.ipynb' (Note: this notebook also performs the preprocessing and merge of human and NMR datasets to perform comparisons between species)
-
-### B. Pipeline
-
 Read alignment to the *Heterocephalus glaber* reference genome and generation of raw/filtered gene-expression matrices.
 
-* **Tools:** `CellRanger` (v7.0.0 or specified version)
-* **Script:** `scripts/02_cellranger_count.sh`
-* *Note: Custom modifications made to the GTF file (e.g., handling of unannotated untranslated regions or lncRNAs) should be detailed here.*
+- Quality assessment of raw sequence reads to evaluate base qualities, GC content, adapter contamination, and duplication levels: `run_fasqc.sh`
+  
+- Alignment of reads to reference genome using `cellranger` from 10X Genomics:  `run_cellranger.sh`, `01_sequencing_metrics.ipynb`
+  
+- Elimination of background RNA contamination typical in single-nucleus preparations using a deep generative model, `CellBender`: `run_cellbender.sh`, `02_cellbender_qc.ipynb`
+
+- Filter low quality genes and cells: `preprocessing.ipynb`
+
+### B. Pipeline
+- Classic Pipeline (Normalize, HVG, Scale, PCA, KNN, Clustering & UMAP): `01_classic_processing.ipynb`
+  
+- Improved Pipeline after choosing the most adequate integration technique and applying recursive subclustering (both specified in B1): `02_optimal_processing.ipynb`
+  
+- Join defined subclusters and annotations (specified in B2, selected method: CADuMS Annotation): `03_join_clusters_and_annotations.ipynb`
 
 ### B1. Integration Benchmark and Clustering Optimization
 
-Elimination of background/ambient RNA contamination typical in single-nucleus preparations using a deep generative model.
+Three integration methods (to correct the effect given by different replicates) were evaluated: Harmony, BBKNN and scVI. Although unintegrated dataset achieved acceptable replicate mixing and low cell-type mixing (both desirable characteristics) the Harmony integration slightly increased the replicate mixing without affecting the biological conservation given by the cell-type mixing. This procedure is shown in `01_batch_correction_bm.ipynb`.
 
-* **Tools:** `CellBender` v0.3.0 (`remove-background`)
-* **Script:** `scripts/03_cellbender.sh`
-* *Note: [Specify expected-cells and total-droplets parameters used here]*
+Then, a recursive clustering pipeline was developed to derive 3-level grouppings, first "superclusters", then "clusters" and finally "subclusters". An additional hyper-parameter optimization was implemented within each clustering step to adjust the *resolution* parameter in the Leiden algorithm to achive the larger silhouette score. This techinique is detailed in `02_recursive_subclustering.ipynb`
 
 ### B2. Annotation Methods
 
