@@ -103,24 +103,42 @@ Then, a recursive clustering pipeline was developed to derive 3-level grouppings
 
 ### B2. Annotation Methods
 
-Filtering of low-quality nuclei based on data-driven thresholds (e.g., minimum/maximum UMI counts, unique gene counts, and mitochondrial gene percentage bounds tailored to nuclear sequencing).
+Several annotaton methods were used to define cell-types, including celltypist, GSEA and scANVI. Additionally some custom annotation methods were developed to better address the challenges derived from unmatched species references on extrapolating the expected gene expression for every cell-type label on the naked-mole rat brain dataset. 
 
-* **Tools:** `Scanpy` (Python)
-* **Notebook:** `notebooks/04_downstream_qc.Rmd`
+The following methods were developed within this study. Please cite them accordingly (Article publication still pending).
+
+#### Cluster-Aware Dual Marker Score (CADuMS) Annotation
+
+A maker-based method that uses gene scores per panel of possitively and negatively associated markers to a cell-type diven a set of expected celltype classes, and defines the max-scored celltype per cell. Then unconfidently matched cells are marked if the `max total score` is lower than the smallest 20th percentile. After that, a consensus within each subcluster is applied considering the following:
+
+- Homogeneity: Most cells in the subcluster belong to mostly one cell-type.
+- Dual Identity: The second majority cell-type is at least 90% of the fist majority cell-type.
+- Group Confidence: The number of unconfident cells within a subcluster is less than 30%.
+
+This way class labels are merged (with a ` | ` sign) along dual identity groups and marked with an asterisk (*) if they are not confident. Above that, if the group can not comply with an homogeneus composition it is called "Ambiguous" and if it also fails on group confidence or has dual identity it remains as "Unassigned".
+
+##### Method Requirements
+
+- Biological knowledge of the sample to define expected cell-types.
+- Table of possitively and negatively associated gene markers per expected cell-types
+- Manual Parameter setting
+
+* **Notebook:** `B2_Annotation/CADuMS/CADuMS.ipynb`
+
+#### CellTrain
+This method is also a marker-based method which automatically defines the cell identities per each data point. Then a logistic regression model is trained and tested with this data and later used to predict the same original dataset. Although validation infers that the model is learning the structure of the data, it is not fully recommended as it introduces many sources of bias on the second prediction of the same dataset. This method is displayed here as precedent to hopefully be used on other future naked mole rat datasets, after having validated the true naked-mole rat brain cell-types. An important note: This method is derived from the *celltypist* method described in Domínguez Conde *et al.*, 2022.
+
+#### Cross Species Label Transfer (XSLT)
+Finally an integration of the annotated dataset for human adult and developing brain from the Linnarson's Lab with the naked-mole rat dataset was developed to perform a label transfer on similar cells defined to be in the same cluster as the other species cells. Unfortunately many cells of the naked-mole rat remained unannotaded with this method, but it serve as precedent of comparing the two species and can be further used to compare gene expression on similar cell-types across species.
 
 ### C. Manual Refinement
 
-Hyperparameter Optimization (HPO) for clustering resolution combined with an iterative, recursive clustering framework to separate major lineages (neurons, glia, vascular cells) down to distinct sub-populations.
-
-* **Methodology:** [Detail your specific HPO or recursive split metrics here, e.g., Silhouette score, ROGUE, or resolution sweep]
-* **Notebook:** `notebooks/05_recursive_clustering.Rmd`
+Manual refinement was performed using as input the labels obtained from the CADuMS annotation tool, then per each group, the gene expression was evaluated per subluster on each class to see a congruent marker gene expression. Most expressed genes within the group were also investigated to validate their identity and resolve dual identities or unconfident annotations. 
+This refinement was first performed on each region independently and then all regions were analysed together to define the final annotation. In the case of midbrain, only few cells could be recovered so a deep custom cleaning is performed in `03_saving_midbrain.ipynb` and a manual annotation in `04_midbrain_annotation.ipynb`
 
 ### Z. Archive
 
-Multi-pronged approach for cell-type classification using integrated automated tools alongside manual verification with canonical marker genes.
-
-* **Tools Utilized:** [e.g., SingleR, Azimuth, CellTypist, or ScType]
-* **Notebook:** `notebooks/06_cell_type_annotation.Rmd`
+This data was also analysed with Seurat package in R. You can find the old scripts in this folder.
 
 ---
 
@@ -132,50 +150,21 @@ Ensure you have [Conda](https://docs.conda.io/en/latest/) or [mamba](https://mam
 
 ```bash
 # Clone the repository
-git clone [https://github.com/yourusername/nmr-brain-snrna-seq.git](https://github.com/yourusername/nmr-brain-snrna-seq.git)
-cd nmr-brain-snrna-seq
-
-# Create the conda environment
-conda env create -f environment.yml
-
-# Activate environment
-conda activate nmr-snrna-env
+git clone [https://github.com/raqcoss/single-nucleus-nmr.git](https://github.com/raqcoss/single-nucleus-nmr.git)
+cd single-nucleus-nmr
 
 ```
+## References
 
----
+1. Domínguez Conde, C., Xu, C., Jarvis, L., Rainbow, D., Wells, S., Gomes, T., Howlett, S., Suchanek, O., Polanski, K., King, H., Mamanova, L., Huang, N., Szabo, P., Richardson, L., Bolt, L., Fasouli, E., Mahbubani, K., Prete, M., Tuck, L., … Teichmann, S. (2022). Cross-tissue immune cell analysis reveals tissue-specific features in humans. Science (New York, N.Y.), 376(6594), eabl5197. https://doi.org/10.1126/science.abl5197
+2. Xu, C., Prete, M., Webb, S., Jardine, L., Stewart, B. J., Hoo, R., He, P., Meyer, K. B., & Teichmann, S. A. (2023). Automatic cell-type harmonization and integration across Human Cell Atlas datasets. Cell, 186(26), 5876-5891.e20. https://doi.org/10.1016/j.cell.2023.11.026
+3. Braun, E., Danan-Gotthold, M., Borm, L. E., Lee, K. W., Vinsland, E., Lönnerberg, P., Hu, L., Li, X., He, X., Andrusivová, Ž., Lundeberg, J., Barker, R. A., Arenas, E., Sundström, E., & Linnarsson, S. (2023). Comprehensive cell atlas of the first-trimester developing human brain. Science, 382(6667), eadf1226. https://doi.org/10.1126/science.adf1226
+4. Siletti, K., Hodge, R., Mossi Albiach, A., Lee, K. W., Ding, S.-L., Hu, L., Lönnerberg, P., Bakken, T., Casper, T., Clark, M., Dee, N., Gloe, J., Hirschstein, D., Shapovalova, N. V., Keene, C. D., Nyhus, J., Tung, H., Yanny, A. M., Arenas, E., … Linnarsson, S. (2023). Transcriptomic diversity of cell types across the adult human brain. Science, 382(6667), eadd7046. https://doi.org/10.1126/science.add7046
 
-## Usage Instructions
-
-1. **Configure Paths:** Edit `config/config.yaml` to match your local cluster environment and dataset directories.
-2. **Run Read QC:**
-```bash
-bash scripts/01_fastqc.sh
-
-```
-
-
-3. **Execute Mapping & Quantification:**
-```bash
-bash scripts/02_cellranger_count.sh
-
-```
-
-
-4. **Remove Background Contamination:**
-```bash
-bash scripts/03_cellbender.sh
-
-```
-
-
-5. **Interactive Analysis:** Open and run the step-by-step notebooks located within the `notebooks/` directory sequentially.
-
----
 
 ## Authors & Citation
 
-* **Raquel Cossío Ramírez** - *Pipeline development* - [GitHub](https://github.com/raqcoss)
+* **Raquel Cossío Ramírez** - *Pipeline development & alternative annotation methods development*  - [GitHub](https://github.com/raqcoss)
 
 If you use this pipeline or code in your research, please cite:
 
