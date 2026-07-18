@@ -2,33 +2,66 @@
 ├── A_Preprocessing
 │   ├── 01_sequencing_metrics.ipynb
 │   ├── 02_cellbender_qc.ipynb
+│   ├── 03_preprocessing.ipynb
 │   └── orthology
 │       ├── 01_make_orthology_map.ipynb
 │       └── 02_othology_reference.ipynb
-├── B_Cannonical
-├── C_Optimization
-│   ├── figures
-│   │   ├── analysis_0_depth1_silhouette.png
-│   │   ├── analysis_1_depth1_silhouette.png
-│   │   ├── analysis_2_depth1_silhouette.png
-│   │   ├── analysis_3_depth1_silhouette.png
-│   │   ├── analysis_4_depth1_silhouette.png
-│   │   ├── analysis_5_depth1_silhouette.png
-│   │   ├── umap_analysis_0_depth1.png
-│   │   ├── umap_analysis_1_depth1.png
-│   │   ├── umap_analysis_2_depth1.png
-│   │   ├── umap_analysis_3_depth1.png
-│   │   ├── umap_analysis_4_depth1.png
-│   │   ├── umap_analysis_5_depth1.png
-│   │   └── umaphippocampus_recursive_hpo_subclustering_umap.png
-│   └── subcluster copy.ipynb
-├── D_Annotation
+├── B1_Optimization
+│   ├── 01_batch_correction_bm.ipynb
+│   ├── 02_recursive_subclustering.ipynb
+│   └── figures
+│       ├── analysis_0_0_depth2_silhouette.png
+│       ├── analysis_0_1_depth2_silhouette.png
+│       ├── analysis_0_depth1_silhouette.png
+│       ├── analysis_1_0_depth2_silhouette.png
+│       ├── analysis_1_2_depth2_silhouette.png
+│       ├── analysis_1_3_depth2_silhouette.png
+│       ├── analysis_1_5_depth2_silhouette.png
+│       ├── analysis_1_depth1_silhouette.png
+│       ├── analysis_2_0_depth2_silhouette.png
+│       ├── analysis_2_1_depth2_silhouette.png
+│       ├── analysis_2_2_depth2_silhouette.png
+│       ├── analysis_2_3_depth2_silhouette.png
+│       ├── analysis_2_depth1_silhouette.png
+│       ├── analysis_3_0_depth2_silhouette.png
+│       ├── analysis_3_1_depth2_silhouette.png
+│       ├── analysis_3_depth1_silhouette.png
+│       ├── analysis_4_1_depth2_silhouette.png
+│       ├── analysis_4_depth1_silhouette.png
+│       ├── analysis_5_depth1_silhouette.png
+│       ├── analysis_6_depth1_silhouette.png
+│       ├── hippocampus_supercluster_cluster_proportions.png
+│       ├── umap_analysis_0_0_depth2.png
+│       ├── umap_analysis_0_1_depth2.png
+│       ├── umap_analysis_0_depth1.png
+│       ├── umap_analysis_1_0_depth2.png
+│       ├── umap_analysis_1_2_depth2.png
+│       ├── umap_analysis_1_3_depth2.png
+│       ├── umap_analysis_1_5_depth2.png
+│       ├── umap_analysis_1_depth1.png
+│       ├── umap_analysis_2_0_depth2.png
+│       ├── umap_analysis_2_1_depth2.png
+│       ├── umap_analysis_2_2_depth2.png
+│       ├── umap_analysis_2_3_depth2.png
+│       ├── umap_analysis_2_depth1.png
+│       ├── umap_analysis_3_0_depth2.png
+│       ├── umap_analysis_3_1_depth2.png
+│       ├── umap_analysis_3_depth1.png
+│       ├── umap_analysis_4_1_depth2.png
+│       ├── umap_analysis_4_depth1.png
+│       ├── umap_analysis_5_depth1.png
+│       ├── umap_analysis_6_depth1.png
+│       └── umaphippocampus_recursive_hpo_subclustering_umap.png
+├── B2_Annotation
 │   ├── CADuMS
 │   │   ├── CADuMS.ipynb
 │   │   └── celltype_lineage.png
 │   ├── CellTrain
+│   │   ├── final_ann.ipynb
 │   │   ├── primary_celltypes.ipynb
 │   │   └── primary_celltypes_v2.ipynb
+│   ├── celltypist
+│   │   └── celltypist_annotation.ipynb
 │   ├── gseapy
 │   │   └── gsea_ann.ipynb
 │   ├── PanglaoDB_markers_27_Mar_2020.tsv
@@ -37,6 +70,18 @@
 │   └── XSLT
 │       ├── 1_main_preprocessing.ipynb
 │       └── 2_cross_species_annotation.ipynb
+├── B_Pipeline
+│   ├── 01_classic_processing.ipynb
+│   ├── 02_optimal_processing.ipynb
+│   └── 03_join_clusters_and_annotations.ipynb
+├── C_Refinement
+│   ├── 01_cortex_cadmus_refinement.ipynb
+│   ├── 02_hippocampus_cadmus_refinement.ipynb
+│   ├── 03_saving_midbrain.ipynb
+│   ├── 04_midbrain_annotation.ipynb
+│   ├── 05_all_region_refinement.ipynb
+│   ├── 06_check_refined_annotations.ipynb
+│   └── manual_annotation_all_regions.csv
 ├── data
 │   ├── gene_lists
 │   │   ├── hemo_genes.txt
@@ -51,18 +96,11 @@
 │   └── reference
 │       ├── human_dev_glossary.xlsx
 │       └── human_glossary.csv
-├── E_LabelRefinement
-│   ├── 01_cortex_cadmus_refinement.ipynb
-│   ├── 02_hippocampus_cadmus_refinement.ipynb
-│   ├── 03_saving_midbrain.ipynb
-│   ├── 04_midbrain_annotation.ipynb
-│   ├── 05_all_region_refinement.ipynb
-│   ├── 06_check_refined_annotations.ipynb
-│   └── manual_annotation_all_regions.csv
 ├── environment.yml
 ├── envs
 │   ├── cellbender-env.yml
 │   └── scanpy-env.yml
+├── LICENSE
 ├── pyproject.toml
 ├── README.md
 ├── results
@@ -70,17 +108,22 @@
 │   ├── Cerebral cortex_refined_cell_composition.png
 │   ├── Hippocampus_refined_cell_composition.png
 │   ├── manual_annotation_all_regions.csv
-│   └── Midbrain_refined_cell_composition.png
+│   ├── Midbrain_refined_cell_composition.png
+│   └── preprocessing
+│       ├── cerebral cortex_qc_violins_before_filtering.png
+│       ├── hippocampus_qc_violins_before_filtering.png
+│       └── midbrain_qc_violins_before_filtering.png
 ├── scripts
 │   ├── adaptive_clustering.py
 │   ├── annotation_tools.py
 │   ├── __init__.py
-│   ├── optimization_tools.py
 │   ├── plot_functions.py
+│   ├── preprocessing_tools.py
 │   ├── __pycache__
 │   │   ├── adaptive_clustering.cpython-312.pyc
 │   │   ├── __init__.cpython-312.pyc
-│   │   └── plot_functions.cpython-312.pyc
+│   │   ├── plot_functions.cpython-312.pyc
+│   │   └── preprocessing_tools.cpython-312.pyc
 │   ├── run_cellbender.sh
 │   ├── run_cellranger.sh
 │   ├── run_fastqc.sh
@@ -116,4 +159,4 @@
         ├── tf_genes.txt
         └── top_gsea_pathways.csv
 
-24 directories, 92 files
+26 directories, 133 files

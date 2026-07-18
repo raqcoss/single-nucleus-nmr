@@ -2,7 +2,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def plot_qc_violin_with_thres(adata, qc_cuts=None, region_col = "region"):
+def plot_qc_violin_with_thres(adata, qc_cuts=None, 
+                              region_col = "region", 
+                              plot_keys:list = ["n_genes_by_counts", "total_counts", "pct_counts_mt", 'pct_counts_ribo'],
+                              figsize:tuple=(18, 4)
+                              ):
     """Plots violin plots with jittered data points and red threshold lines for single-cell QC metrics.
 
     This function generates a single row of four violin plots (number of genes, total counts, 
@@ -51,8 +55,7 @@ def plot_qc_violin_with_thres(adata, qc_cuts=None, region_col = "region"):
         'pct_counts_ribo': 7}
     tissue = adata.obs[region_col].iloc[0]
     print(f"Plotting {tissue}")
-    plot_keys = ["n_genes_by_counts", "total_counts", "pct_counts_mt", 'pct_counts_ribo']
-    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+    fig, axes = plt.subplots(1, 4, figsize=figsize)
     for i, key in enumerate(plot_keys):
         # Create violin plot with seaborn
         data_to_plot = adata.obs[[key]].copy()
@@ -84,7 +87,7 @@ def plot_highly_variable_genes(
     adata, 
     save_suffix: str, 
     n_top_genes: int = 20, 
-    figsize: tuple = (6, 4)
+    figsize: tuple = (6, 5)
 ):
     """
     Plot a scatter plot of mean vs. normalized variance, highlighting and labeling 
