@@ -13,6 +13,8 @@ This repository contains the bioinformatics pipeline and custom scripts develope
   - [B1. Integration Benchmark and Clustering Optimization](#b1-optimization)
   - [B2. Annotation Methods](#b2-annotation)
     - [Cluster-Aware Dual Marker Score (CADuMS) Annotation](#cluster-aware-dual-marker-score-cadums-annotation)
+    - [TrainCell](#traincell)
+    - [Cross Species Label Transfer (XSLT)](#cross-species-label-transfer-xslt)
   - [C. Manual Refinement](#c-manual-refinement)
   - [Z. Archive](#z-archive)
 - [Installation & Environment Setup](#-installation--environment-setup)
