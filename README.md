@@ -1,6 +1,6 @@
 # Naked Mole-Rat Brain snRNA-Seq Analysis Pipeline
 
-This repository contains the bioinformatics pipeline and custom scripts developed for the processing, quality control, clustering, and cell-type annotation of single-nucleus RNA-sequencing (snRNA-seq) data derived from the naked mole-rat (*Heterocephalus glaber*) brain. This project is a colaboration between researchers from the National Autonomous University of Mexico (UNAM) and the Monterrey Institute of Technology and Higher Education (ITESM). 
+This repository contains the bioinformatics pipeline and custom scripts developed for the processing, quality control, clustering, and cell-type annotation of single-nucleus RNA-sequencing (snRNA-seq) data derived from the naked mole-rat (*Heterocephalus glaber*) brain. This project is part of a colaboration between researchers from the National Autonomous University of Mexico (UNAM) and the Monterrey Institute of Technology and Higher Education (ITESM). 
 
 ---
 
