@@ -28,7 +28,8 @@ This repository contains the bioinformatics pipeline and custom scripts develope
 
 The naked mole-rat exhibits extraordinary physiological traits, including extreme longevity, cancer resistance, and hypoxia tolerance. Specifically, they presume to avoid neurodegeneration, which drives the motivation behind this study to discover the cellular mechanisms within the cerebral cortex, hippocampus, and midbrain regions using single-nucleus transcriptomics. 
 
-This repository standardizes the workflow from raw `.fastq` reads to stable clusters and their cell-type annotations while addressing the unique challenges associated with analyzing the naked mole-rat transcriptome, such as the limited availability of a genome reference, ambient RNA contamination in nuclear preparations, and identifying novel cell types in this non-model organism.
+
+This repository standardizes the workflow from raw `.fastq` reads to stable clusters and their cell-type annotations. It also addresses the unique challenges of analyzing the naked mole-rat transcriptome, such as the limited availability of a genome reference, ambient RNA contamination in nuclear preparations, and identifying novel cell types in this non-model organism.
 
 ---
 
